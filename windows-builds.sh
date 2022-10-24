@@ -162,7 +162,9 @@ mpg123_build()
 		echo "text file $i -> $final/$name/$i.txt"
 		./unix2dos < "$i" > "$final/$name/$i.txt"
 	done &&
-	cp doc/windows-notes.html "$final/$name/"
+	cp doc/windows-notes.html "$final/$name/" &&
+	(cd "$final/$name/" && zip -r ../$name.zip --compression-method deflate -9 *) &&
+	true
 }
 
 prepare_dir &&
