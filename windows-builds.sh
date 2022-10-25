@@ -29,21 +29,25 @@ case $build_type in
     decoder=x86
     strip=strip
     hostopt="CPPFLAGS=-D__MINGW_USE_VC2005_COMPAT=1"
+    makecheck=y
   ;;
   x86_64)
     decoder=x86-64
     strip=strip
     hostopt=
+    makecheck=y
   ;;
   x86-cross)
     decoder=x86
     strip=i686-w64-mingw32-strip
     hostopt="--host=i686-w64-mingw32 --build=`./build/config.guess` CPPFLAGS=-D__MINGW_USE_VC2005_COMPAT=1"
+    makecheck=n
   ;;
   x86_64-cross)
     decoder=x86-64
     strip=x86_64-w64-mingw32-strip
     hostopt="--host=x86_64-w64-mingw32 --build=`./build/config.guess`"
+    makecheck=n
   ;;
   *)
     echo "Unknown build type!"
@@ -126,7 +130,13 @@ mpg123_build()
 	# it is an option.
 	./configure $hostopt \
 	  --prefix=$tmp $myopts --with-cpu=$cpu &&
-	make -j${build_procs:-1} && make install &&
+	make -j${build_procs:-1} &&
+	if test "$makecheck" = y; then
+		make check
+	else
+		echo "Not running make check for cross-compile..."
+	fi &&
+	make install &&
 	rm -rf "$final/$name" &&
 	mkdir  "$final/$name" &&
 	cp -v "$tmp/bin/"*.exe "$final/$name" &&

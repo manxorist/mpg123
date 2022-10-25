@@ -9,7 +9,7 @@ ref="$srcdir/src/tests/plain_id3.txt"
 
 src/tests/plain_id3 "$sweep" > src/tests/plain_id3.out.txt
 
-if ! diff -q "$ref" "$out"; then
+if ! diff -q -b "$ref" "$out"; then
   exit 1
 fi
 echo PASS
