@@ -4,10 +4,18 @@ on: push
 
 jobs:
   build:
-    runs-on: windows-latest
     defaults:
       run:
         shell: cmd
+    strategy:
+      matrix:
+        # currently windows-latest==windows-2022
+        # windows-2022: VS2022
+        # windows-2019: VS2019
+        os: [windows-2022, windows-2019]
+        arch: [Win32, x64, ARM, ARM64]
+        shared: [ON, OFF]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: fetch yasm
@@ -15,6 +23,6 @@ jobs:
       - name: add yasm to path
         run: echo "%GITHUB_WORKSPACE%" >> %GITHUB_PATH%
       - name: CMake
-        run: cd ports\cmake && cmake -DYASM_ASSEMBLER=%GITHUB_WORKSPACE%\yasm .
+        run: cd ports\cmake && cmake -A ${{ matrix.arch }} -DYASM_ASSEMBLER=%GITHUB_WORKSPACE%\yasm -DBUILD_SHARED_LIBS=${{ matrix.shared }} .
       - name: CMake --build
         run: cd ports\cmake && cmake --build .
